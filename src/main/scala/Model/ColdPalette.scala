@@ -2,6 +2,7 @@ package Model
 
 /**
   * Created by dagum on 08-12-2017.
+  * Palette with predominant blue colors
   */
 class ColdPalette extends ColorPalette{
   override def get(i: Int, iters: Int, c: Complex): (Int, Int, Int) = {

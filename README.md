@@ -7,5 +7,6 @@ Second version of Julia/Maldelbrot fractals, rewritten in scala
 
 ## Usage
 1. Movement : Drag the mouse over canvas
-2. Zoom in: UP Arrow
-3. Zoom out: DOWN Arrow
+2. Zoom in: W
+3. Zoom out: S
+4. ScreenShot: P

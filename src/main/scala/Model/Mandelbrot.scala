@@ -1,7 +1,5 @@
 package Model
 
-import scalafx.scene.paint.Color
-
 /**
   * Created by dagum on 08-12-2017.
   */

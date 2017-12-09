@@ -2,6 +2,7 @@ package Model
 
 /**
   * Created by dagum on 08-12-2017.
+  * Palette with predominant red colors
   */
 class HotPalette extends ColorPalette {
   override def get(i: Int, iters: Int, c: Complex): (Int, Int, Int) = {
