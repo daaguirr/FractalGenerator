@@ -21,7 +21,7 @@ object Canvas extends JFXApp {
   val global_height: Int = 480
   var matrix: Array[Array[Color]] = Array.ofDim[Color](global_width, global_height)
 
-  val color: ColorPalette = new PrettyPalette()
+  val color: ColorPalette = new PrettyPalette
   var fractal: Fractal = new Mandelbrot(global_width, global_height, color)
   //fractal = new GeneralizedJulia(global_width, global_height, color, c => c * c * c.exp + new Complex(0.21, 0))
   //fractal = new Julia(global_width, global_height, color,new Complex(-0.8,0.156))

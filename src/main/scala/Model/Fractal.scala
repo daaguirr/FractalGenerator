@@ -15,6 +15,7 @@ abstract class Fractal(var _width: Int, var _height: Int, val colorPalette: Colo
     * @param scale
     */
   def generate(iters: Int, x_offset: Double, y_offset: Double, scale: Double): Unit = {
+    // TODO: fix overflow bug
     var next = 10
     for (iy <- 0 until _height) {
       if (iy * 100.0 / _height > next) {
