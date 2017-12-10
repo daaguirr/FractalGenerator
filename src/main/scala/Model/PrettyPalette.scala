@@ -7,7 +7,7 @@ import com.opengamma.strata.math.impl.interpolation.PiecewiseCubicHermiteSplineI
 /**
   * Created by dagum on 08-12-2017.
   * Palette with common fractal colors
-  * Idea: Interpolate with spline interpolation 5 points representing colors con a gradient
+  * Idea: Interpolate with spline interpolation 5 points representing colors with a gradient
   *       then create a list of tuple3 representing colors with equal spacing partition of [0,1] on 512 parts
   */
 class PrettyPalette extends ColorPalette{
