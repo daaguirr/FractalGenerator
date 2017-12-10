@@ -8,7 +8,7 @@ import javax.imageio.ImageIO
 
 import Model._
 
-import scalafx.application.JFXApp
+import scalafx.application.{JFXApp, Platform}
 import scalafx.embed.swing.SwingFXUtils
 import scalafx.scene.Scene
 import scalafx.scene.canvas.{Canvas, GraphicsContext}
@@ -30,7 +30,7 @@ object Canvas extends JFXApp {
   // Fractal Settings
   var currentOffX = 0d
   var currentOffY = 0d
-  var currentScale = 1
+  var currentScale: Double = 1
   var currentItersHD = 40
   var currentItersLC = 10
   var lastX = 0d
@@ -53,8 +53,8 @@ object Canvas extends JFXApp {
     }
   }
 
-  /***
-    *  Starting Dragging, set initial drag point
+  /** *
+    * Starting Dragging, set initial drag point
     */
   canvas.setOnDragDetected(event => {
     lastX = event.getSceneX
@@ -62,18 +62,18 @@ object Canvas extends JFXApp {
     event.consume()
   })
 
-  /***
+  /** *
     * Generate pre-visualization when the user move the fractal
     */
   canvas.setOnMouseDragged(event => {
     gc.clearRect(0, 0, canvas.getWidth, canvas.getHeight) // Clean Canvas
-    currentOffX -= (1.0/currentScale)*0.3*(event.getSceneX - lastX) / global_width
-    currentOffY -= (1.0/currentScale)*0.3*(event.getSceneY - lastY) / global_height
+    currentOffX -= (1.0 / currentScale) * 0.3 * (event.getSceneX - lastX) / global_width
+    currentOffY -= (1.0 / currentScale) * 0.3 * (event.getSceneY - lastY) / global_height
     generateFractal(currentItersLC)
     event.consume()
   })
 
-  /***
+  /** *
     * Drag is Done, generate full quality fractal
     */
   canvas.setOnMouseReleased(event => {
@@ -82,19 +82,19 @@ object Canvas extends JFXApp {
     event.consume()
   })
 
-  /***
+  /** *
     * KeyPress Handler {Zoom , ScreenShot}
     */
   stage.getScene.setOnKeyPressed(event => {
     event.getCode match {
       case KeyCode.W => // Zoom In
-        currentItersHD+=3
-        currentItersLC+=3
+        currentItersHD += 3
+        currentItersLC += 3
         currentScale *= 2
       case down if down == KeyCode.S && currentScale > 1 => // Zoom Out
         currentScale /= 2
-        currentItersHD-=3
-        currentItersLC-=3
+        currentItersHD -= 3
+        currentItersLC -= 3
       case KeyCode.P => saveImage() // ScreenShot
       case _ =>
     }
@@ -103,12 +103,13 @@ object Canvas extends JFXApp {
     event.consume()
   })
 
-  /***
+  /** *
     * Generate fractal using the canvas
+    *
     * @param iters detail of generation
     */
-  def generateFractal(iters : Int): Unit ={
-    fractal.generate(iters, currentOffX , currentOffY , currentScale)
+  def generateFractal(iters: Int): Unit = {
+    fractal.generate(iters, currentOffX, currentOffY, currentScale)
     matrix = fractal.matrix
     for (i <- 0 until global_width) {
       for (j <- 0 until global_height) {
@@ -117,7 +118,7 @@ object Canvas extends JFXApp {
     }
   }
 
-  /***
+  /** *
     * Save a screenshot of canvas
     */
   def saveImage(): Unit = {
@@ -128,7 +129,7 @@ object Canvas extends JFXApp {
     ImageIO.write(renderedImage, "png", file)
   }
 
-  /***
+  /** *
     * Select fractal dialog
     */
   def choiceFractalDialog(): Unit = {
@@ -142,24 +143,25 @@ object Canvas extends JFXApp {
     val result = dialog.showAndWait()
     result match {
       case Some(choice) => selectChoiceFractal(choice)
-      case None         => System.exit(0)
+      case None => System.exit(0)
     }
   }
 
   /**
     * Change fractal variable by a new fractal of choice
+    *
     * @param choice {Mandelbrot,Julia,Generalized Julia}
     */
-  def selectChoiceFractal(choice : String): Unit ={
+  def selectChoiceFractal(choice: String): Unit = {
     choice match {
       case "Mandelbrot" => fractal = new Mandelbrot(global_width, global_height, color)
-      case "Julia" => fractal = new Julia(global_width, global_height, color,new Complex(-0.8,0.156))
-      case "Generalized Julia" => fractal= new GeneralizedJulia(global_width, global_height, color, c => c * c * c.exp + new Complex(0.21, 0))
+      case "Julia" => fractal = new Julia(global_width, global_height, color, new Complex(-0.8, 0.156))
+      case "Generalized Julia" => fractal = new GeneralizedJulia(global_width, global_height, color, c => c * c * c.exp + new Complex(0.21, 0))
       case _ =>
     }
   }
 
-  /***
+  /** *
     * Select color dialog
     */
   def choiceColorDialog(): Unit = {
@@ -173,15 +175,16 @@ object Canvas extends JFXApp {
     val result = dialog.showAndWait()
     result match {
       case Some(choice) => selectChoiceColor(choice)
-      case None         => System.exit(0)
+      case None => System.exit(0)
     }
   }
 
   /**
     * Change color fractal variable by a new color
+    *
     * @param choice {Cold, Hot, Pretty}
     */
-  def selectChoiceColor(choice : String): Unit ={
+  def selectChoiceColor(choice: String): Unit = {
     choice match {
       case "Cold" => fractal.colorPalette = new ColdPalette
       case "Hot" => fractal.colorPalette = new HotPalette
@@ -189,5 +192,14 @@ object Canvas extends JFXApp {
       case _ =>
     }
   }
+
+  /**
+    * New quit window handler to shutdown pool on fractal
+    */
+  stage.setOnCloseRequest(_ => {
+    fractal.pool.shutdown()
+    Platform.exit
+    System.exit(0)
+  })
 
 }

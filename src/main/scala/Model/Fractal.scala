@@ -1,5 +1,7 @@
 package Model
 
+import java.util.concurrent.{CountDownLatch, ExecutorService, Executors}
+
 import scalafx.scene.paint.Color
 
 /**
@@ -7,7 +9,7 @@ import scalafx.scene.paint.Color
   */
 abstract class Fractal(var _width: Int, var _height: Int, var colorPalette: ColorPalette) {
   var matrix: Array[Array[Color]] = Array.ofDim[Color](_width, _height)
-
+  val pool: ExecutorService = Executors.newFixedThreadPool(4)
   /** *
     * Generate matrix color representing fractal
     * @param iters max number of iters
@@ -17,18 +19,19 @@ abstract class Fractal(var _width: Int, var _height: Int, var colorPalette: Colo
     */
   def generate(iters: Int, x_offset: Double, y_offset: Double, scale: Double): Unit = {
     // TODO: fix overflow bug
-    var next = 10
+    val latch = new CountDownLatch(_height*_width)
     for (iy <- 0 until _height) { // print 10% step
-      if (iy * 100.0 / _height > next) {
-        println(next + "%")
-        next += 10
-      }
       for (ix <- 0 until _width) {
-        val (z, iter) = getVal(ix * 1.0 / _width, iy * 1.0 / _height, x_offset, y_offset, scale, iters) // evaluate function
-        val color = colorPalette.get(iter, iters, z) // get color of result
-        matrix(ix)(iy) = Color.rgb(color._1, color._2, color._3) // set color
+        pool.execute(() => {
+          latch.countDown()
+          val (z, iter) = getVal(ix * 1.0 / _width, iy * 1.0 / _height, x_offset, y_offset, scale, iters) // evaluate function
+          val color = colorPalette.get(iter, iters, z) // get color of result
+          setMatrix(ix, iy, Color.rgb(color._1, color._2, color._3)) // set color
+        })
+
       }
     }
+    latch.await()
   }
 
   /***
@@ -43,4 +46,13 @@ abstract class Fractal(var _width: Int, var _height: Int, var colorPalette: Colo
     */
   def getVal(ix: Double, iy: Double, x_offset: Double, y_offset: Double, scale: Double, max_iters: Int): (Complex, Int)
 
+  /**
+    * Thread Safe matrix setter
+    * @param x x position on matrix
+    * @param y y position on matrix
+    * @param color new color
+    */
+  private def setMatrix(x : Int,y : Int,color: Color): Unit = matrix.synchronized {
+    matrix(x)(y) = color
+  }
 }
