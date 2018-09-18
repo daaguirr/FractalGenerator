@@ -50,11 +50,11 @@ object NewCanvas extends JFXApp {
   stage.getScene.setOnKeyPressed(event => {
     event.getCode match {
       case KeyCode.W => // Zoom In
-        currentItersHD += 5
+        currentItersHD += 10
         currentScale += 1
       case down if down == KeyCode.S && currentScale > 1 => // Zoom Out
         currentScale -= 1
-        currentItersHD -= 5
+        currentItersHD -= 10
       case _ =>
     }
     println(currentScale)

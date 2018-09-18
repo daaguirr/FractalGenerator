@@ -38,7 +38,8 @@ class NewMandelbrot(_width: Int, _height: Int, colorPalette: ColorPalette) {
     val yoff = y_offset - _height / 2
 
 
-    val sgn = scale - last_scale
+    var sgn = scale - last_scale
+    if (sgn < 0) sgn *= 2
 
     xa = xa + xoff * deltax / _width + sgn * deltax / 4
     xb = xb + xoff * deltax / _width - sgn * deltax / 4
